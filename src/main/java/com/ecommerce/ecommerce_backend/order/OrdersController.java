@@ -22,67 +22,46 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 @Transactional
-@Tag(
-	    name = "Orders",
-	    description = "Order checkout, retrieval, and cancellation APIs"
-	)
+@Tag(name = "Orders", description = "Order checkout, retrieval, and cancellation APIs")
 public class OrdersController {
 
 	private final OrdersService ordersService;
-	
-	
-	@Operation(
-	        summary = "Checkout cart and create order",
-	        description = """
-	            Converts the logged-in user's cart into an order.
-	            Clears the cart after successful order creation.
-	            Initial order status is CREATED.
-	            """
-	    )
-	    @ApiResponses({
-	        @ApiResponse(responseCode = "200", description = "Order created successfully"),
-	        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-	        @ApiResponse(responseCode = "404", description = "Cart is empty")
-	    })
+
+	@Operation(summary = "Checkout cart and create order", description = """
+			Converts the logged-in user's cart into an order.
+			Clears the cart after successful order creation.
+			Initial order status is CREATED.
+			""")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Order created successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized"),
+			@ApiResponse(responseCode = "404", description = "Cart is empty") })
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<OrdersResponseDTO> checkout(){
+	public ResponseEntity<OrdersResponseDTO> checkout() {
 		return ResponseEntity.ok(ordersService.checkout());
 	}
-	
-	
-	@Operation(
-	        summary = "Get my orders",
-	        description = "Fetches all orders placed by the currently logged-in user"
-	    )
-	    @ApiResponses({
-	        @ApiResponse(responseCode = "200", description = "Orders fetched successfully"),
-	        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-	        @ApiResponse(responseCode = "404", description = "No orders found")
-	    })
+
+	@Operation(summary = "Get my orders", description = "Fetches all orders placed by the currently logged-in user")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Orders fetched successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized"),
+			@ApiResponse(responseCode = "404", description = "No orders found") })
 	@GetMapping("/myOrders")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity <List<OrdersResponseDTO>> myOrders(){
+	public ResponseEntity<List<OrdersResponseDTO>> myOrders() {
 		return ResponseEntity.ok(ordersService.myOrders());
 	}
-	
-	
-	 @Operation(
-		        summary = "Cancel an order",
-		        description = """
-		            Cancels an order belonging to the logged-in user.
-		            Only orders in CREATED state can be cancelled.
-		            """
-		    )
-		    @ApiResponses({
-		        @ApiResponse(responseCode = "200", description = "Order cancelled successfully"),
-		        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-		        @ApiResponse(responseCode = "404", description = "Order not found")
-		    })
+
+	@Operation(summary = "Cancel an order", description = """
+			Cancels an order belonging to the logged-in user.
+			Only orders in CREATED state can be cancelled.
+			""")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Order cancelled successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized"),
+			@ApiResponse(responseCode = "404", description = "Order not found") })
 	@PatchMapping("/cancel/{orderId}")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<OrdersResponseDTO> cancelOrder(@PathVariable Long orderId) {
-	    return ResponseEntity.ok(ordersService.cancelOrder(orderId));
+		return ResponseEntity.ok(ordersService.cancelOrder(orderId));
 	}
 
 }

@@ -19,21 +19,18 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 
-        // Set 401 for unauthorized access
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        String message = "Unauthorized";
+		// Set 401 for unauthorized access
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setContentType("application/json");
+		String message = "Unauthorized";
 
-        if (authException instanceof UsernameNotFoundException) {
-            message = "Username does not exist";
-        } 
-        else if (authException instanceof BadCredentialsException) {
-            message = "Invalid password";
-        }
+		if (authException instanceof UsernameNotFoundException) {
+			message = "Username does not exist";
+		} else if (authException instanceof BadCredentialsException) {
+			message = "Invalid password";
+		}
 
-     
-        response.getWriter().write("{\"error\": \"" + message + "\"}");
-    
+		response.getWriter().write("{\"error\": \"" + message + "\"}");
 
 	}
 

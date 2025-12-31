@@ -26,47 +26,44 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
-	 private final Environment env;
-	
-	
-	@Bean 
-	SecurityFilterChain defaultSecurityFilterChain (HttpSecurity http,AuthenticationManager authManager) throws Exception {
-		
-		 JWTTokenValidatorFilter validatorFilter =
-		            new JWTTokenValidatorFilter(env);
+	private final Environment env;
 
-		 
+	@Bean
+	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, AuthenticationManager authManager)
+			throws Exception {
+
+		JWTTokenValidatorFilter validatorFilter = new JWTTokenValidatorFilter(env);
+
 		http.csrf(csrfConfig -> csrfConfig.disable())
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.addFilterBefore(validatorFilter, BasicAuthenticationFilter.class)
-			.authorizeHttpRequests((requests) -> requests
-												.requestMatchers("/cart","/cart/**").hasAnyRole("USER","ADMIN") 
-												.requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
-												//public endpoints
-												.requestMatchers("/users/login","/error","/users/register","/products","/category","/products/**", "/category/**", "/v3/api-docs/**",
-									                    "/swagger-ui/**",
-									                    "/swagger-ui.html").permitAll()
-												.requestMatchers( "/users/**").authenticated() 
-			
-			.anyRequest().authenticated())
-			.exceptionHandling(e->e.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
-			.formLogin(t   -> t.disable())
-			.httpBasic(withDefaults());
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(validatorFilter, BasicAuthenticationFilter.class)
+				.authorizeHttpRequests((requests) -> requests.requestMatchers("/cart", "/cart/**")
+						.hasAnyRole("USER", "ADMIN").requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+						// public endpoints
+						.requestMatchers("/users/login", "/error", "/users/register", "/products", "/category",
+								"/products/**", "/category/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+						.permitAll().requestMatchers("/users/**").authenticated()
+
+						.anyRequest().authenticated())
+				.exceptionHandling(e -> e.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+				.formLogin(t -> t.disable()).httpBasic(withDefaults());
 		return http.build();
-		
-		
+
 	}
-	
+
 	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
+
 	@Bean
-	public AuthenticationManager authenticationManager(CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder ) {
-		CustomPasswordAuthentication authenticationProvider = new CustomPasswordAuthentication(userDetailsService, passwordEncoder);
+	public AuthenticationManager authenticationManager(CustomUserDetailsService userDetailsService,
+			PasswordEncoder passwordEncoder) {
+		CustomPasswordAuthentication authenticationProvider = new CustomPasswordAuthentication(userDetailsService,
+				passwordEncoder);
 		ProviderManager providerManager = new ProviderManager(authenticationProvider);
-		 // Do not erase credentials after authentication
+		// Do not erase credentials after authentication
 		providerManager.setEraseCredentialsAfterAuthentication(false);
-	    return providerManager;
-	}}
-	
+		return providerManager;
+	}
+}

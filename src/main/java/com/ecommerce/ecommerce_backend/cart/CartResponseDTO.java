@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class CartResponseDTO {
-    private Long cartId;
-    private double total;
-    private List<CartItemResponseDTO> items;
+	private Long cartId;
+	private double total;
+	private List<CartItemResponseDTO> items;
 }

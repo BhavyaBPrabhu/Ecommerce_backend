@@ -22,25 +22,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="orders")
+@Table(name = "orders")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Orders {
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@ManyToOne(fetch= FetchType.LAZY)
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Users user;
-	
+
 	@Enumerated(EnumType.STRING)
 	private OrdersStatus ordersStatus;
-	
-	@OneToMany(mappedBy = "order", cascade= CascadeType.ALL,  orphanRemoval = true)
+
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OrdersItem> items = new ArrayList<>();
 	private LocalDateTime createdAt;
-	
+
 	private Double totalAmount;
 }

@@ -28,86 +28,74 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class JWTTokenValidatorFilter extends OncePerRequestFilter{
+public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
-	 private final Environment env;
+	private final Environment env;
 
-	    public JWTTokenValidatorFilter(Environment env) {
-	        this.env = env;
-	    }
-	    
+	public JWTTokenValidatorFilter(Environment env) {
+		this.env = env;
+	}
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		
-		   String authHeader  = request.getHeader(ApplicationConstants.JWT_HEADER);
-	       if(authHeader !=null &&  authHeader.startsWith("Bearer ")  && SecurityContextHolder.getContext().getAuthentication() == null) {
-	    	
-	    	   try {
-	              
-	    		   String jwt = authHeader.substring(7); // remove "Bearer "
-	    		   
-	                   String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
-	                           ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
-	                   SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-	                  
-	                   Claims claims = Jwts.parserBuilder()
-	                               .setSigningKey(secretKey)
-	                               .build()
-	                               .parseClaimsJws(jwt)
-	                               .getBody();
-	                       String username = String.valueOf(claims.get("username"));
-	                       String authorities = String.valueOf(claims.get("authorities"));
-	                       Long userId = Long.valueOf(claims.get("userId").toString());
-	                       
 
-	                       AuthUserPrincipal principal =
-	                               new AuthUserPrincipal(userId, username);
+		String authHeader = request.getHeader(ApplicationConstants.JWT_HEADER);
+		if (authHeader != null && authHeader.startsWith("Bearer ")
+				&& SecurityContextHolder.getContext().getAuthentication() == null) {
 
-	                       Authentication authentication =
-	                               new UsernamePasswordAuthenticationToken(
-	                                       principal,
-	                                       null,
-	                                       AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)
-	                               );
-	                       
-	                       SecurityContextHolder.getContext().setAuthentication(authentication);
-	                   
-	               }
+			try {
 
-	           catch (ExpiredJwtException ex) {
-	                throw new BadCredentialsException("JWT token has expired!", ex);
+				String jwt = authHeader.substring(7); // remove "Bearer "
 
-	            } catch (UnsupportedJwtException ex) {
-	                throw new BadCredentialsException("Unsupported JWT token!", ex);
+				String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
+						ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+				SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
-	            } catch (MalformedJwtException ex) {
-	                throw new BadCredentialsException("Malformed JWT token!", ex);
+				Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(jwt).getBody();
+				String username = String.valueOf(claims.get("username"));
+				String authorities = String.valueOf(claims.get("authorities"));
+				Long userId = Long.valueOf(claims.get("userId").toString());
 
-	            } catch (SignatureException ex) {
-	                throw new BadCredentialsException("Invalid JWT signature!", ex);
+				AuthUserPrincipal principal = new AuthUserPrincipal(userId, username);
 
-	            } catch (IllegalArgumentException ex) {
-	                throw new BadCredentialsException("Invalid JWT token!", ex);
+				Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null,
+						AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
 
-	            } catch (Exception ex) {
-	                throw new BadCredentialsException("Invalid Token received!", ex);
-	            }
-	        }
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 
-	           
-	       
-	        filterChain.doFilter(request,response);
-	    
+			}
+
+			catch (ExpiredJwtException ex) {
+				throw new BadCredentialsException("JWT token has expired!", ex);
+
+			} catch (UnsupportedJwtException ex) {
+				throw new BadCredentialsException("Unsupported JWT token!", ex);
+
+			} catch (MalformedJwtException ex) {
+				throw new BadCredentialsException("Malformed JWT token!", ex);
+
+			} catch (SignatureException ex) {
+				throw new BadCredentialsException("Invalid JWT signature!", ex);
+
+			} catch (IllegalArgumentException ex) {
+				throw new BadCredentialsException("Invalid JWT token!", ex);
+
+			} catch (Exception ex) {
+				throw new BadCredentialsException("Invalid Token received!", ex);
+			}
+		}
+
+		filterChain.doFilter(request, response);
 
 	}
-	 // Skip validation for public endpoints (login/register/products/category/error)
-	@Override	
+
+	// Skip validation for public endpoints (login/register/products/category/error)
+	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		 String path = request.getServletPath();
-	        if (path == null) return false;
-	        return path.equals("/users/login")
-	                || path.equals("/users/register")
-	                || path.equals("/error");
+		String path = request.getServletPath();
+		if (path == null)
+			return false;
+		return path.equals("/users/login") || path.equals("/users/register") || path.equals("/error");
 	}
 }

@@ -12,17 +12,16 @@ import lombok.Data;
 @Data
 public class OrdersItem {
 
-	  @Id
-	  @GeneratedValue(strategy = GenerationType.IDENTITY)
-	  private Long id;
-	  
-	  @ManyToOne(fetch= FetchType.LAZY)
-	  private Orders order;
-	  
-	  private Long productId;
-	  private String productName;
-	  private Double productPrice;
-	  private int productQuantity;
-	  
-	  
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Orders order;
+
+	private Long productId;
+	private String productName;
+	private Double productPrice;
+	private int productQuantity;
+
 }

@@ -19,21 +19,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cart {
 
-	  @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-	    private Double totalPrice;
+	private Double totalPrice;
 
-	    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-	    private List<CartItem> items = new ArrayList<>();
-	    
-	    @OneToOne
-	    @JoinColumn(name="user_id",unique=true)
-	    private Users user;
+	@OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CartItem> items = new ArrayList<>();
+
+	@OneToOne
+	@JoinColumn(name = "user_id", unique = true)
+	private Users user;
 }

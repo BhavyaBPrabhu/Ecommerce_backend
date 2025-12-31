@@ -18,23 +18,23 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name="authority")
+@Table(name = "authority")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = "user")
 public class Authority {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="authority_id")
+	@Column(name = "authority_id")
 	private long id;
-	
+
 	private String name;
-	
+
 	@ManyToOne(optional = false)
-	@JoinColumn(name="user_id",nullable = false)
+	@JoinColumn(name = "user_id", nullable = false)
 	@JsonBackReference
 	private Users user;
 

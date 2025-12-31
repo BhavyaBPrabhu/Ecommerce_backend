@@ -24,14 +24,14 @@ import lombok.NoArgsConstructor;
 @Data
 public class Category {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+	@Column(nullable = false, unique = true)
+	private String name;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Product> products;
+	@OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Product> products;
 }

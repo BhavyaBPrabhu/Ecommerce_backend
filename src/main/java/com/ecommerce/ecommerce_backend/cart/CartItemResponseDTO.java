@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class CartItemResponseDTO {
 	private Integer quantity;
-    private ProductViewDTO  product;
+	private ProductViewDTO product;
 }

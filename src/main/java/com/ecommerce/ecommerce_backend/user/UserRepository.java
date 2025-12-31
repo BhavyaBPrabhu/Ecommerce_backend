@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<Users, Long> {
 
 	Optional<Users> findByUsername(String username);
+
 	@Query("SELECT u FROM Users u LEFT JOIN FETCH u.authorities")
 	List<Users> findAllWithAuthorities();
 }

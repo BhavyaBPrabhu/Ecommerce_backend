@@ -24,32 +24,37 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name ="users")
+@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = {"authorities", "cart"})
+@ToString(exclude = { "authorities", "cart" })
 public class Users {
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
-	@Column(name="user_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "user_id")
 	private long id;
-	
-	@Column(nullable = false, unique = true) //ensures DB never stores null
+
+	@Column(nullable = false, unique = true) // ensures DB never stores null
 	private String username;
-	
-    @Column(nullable = false)
+
+	@Column(nullable = false)
 	private String password;
-    
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true) //mappedBy = "user" matches the field private User user; in Authority.
-    @JsonManagedReference
-    private Set<Authority> authorities = new HashSet<>();
-	
-	
+
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true) // mappedBy
+																											// = "user"
+																											// matches
+																											// the field
+																											// private
+																											// User
+																											// user; in
+																											// Authority.
+	@JsonManagedReference
+	private Set<Authority> authorities = new HashSet<>();
+
 	@OneToOne(mappedBy = "user")
 	private Cart cart;
-	
-	
+
 }

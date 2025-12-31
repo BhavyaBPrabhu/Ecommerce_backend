@@ -6,6 +6,5 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface OrdersItemResponseMapper {
 
-	
 	OrdersItemResponseDTO toDTO(OrdersItem orderItem);
 }

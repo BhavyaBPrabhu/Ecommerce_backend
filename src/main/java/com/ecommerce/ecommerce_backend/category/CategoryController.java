@@ -24,78 +24,41 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/category")
 @RequiredArgsConstructor
-@Tag(
-	    name = "Category",
-	    description = "APIs to manage product categories (Admin & Public access)"
-	)
+@Tag(name = "Category", description = "APIs to manage product categories (Admin & Public access)")
 public class CategoryController {
 
-	 private final CategoryService service;
+	private final CategoryService service;
 
-	 	@Operation(
-		        summary = "Create a new category",
-		        description = "Creates a new product category. Only ADMIN users are allowed."
-		    )
-		    @ApiResponse(
-		        responseCode = "200",
-		        description = "Category created successfully"
-		       
-		    )
-		    @ApiResponse(
-		        responseCode = "400",
-		        description = "Category already exists or validation failed"
-		    )
-		    @ApiResponse(
-		        responseCode = "403",
-		        description = "Access denied (ADMIN only)"
-		    )
-	    @PostMapping
-	    @PreAuthorize("hasRole('ADMIN')")
-	    public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO dto) {
-	        return ResponseEntity.ok(service.create(dto));
-	    }
+	@Operation(summary = "Create a new category", description = "Creates a new product category. Only ADMIN users are allowed.")
+	@ApiResponse(responseCode = "200", description = "Category created successfully"
 
-	 	  @Operation(
-	 		        summary = "Get all categories",
-	 		        description = "Fetches all categories with pagination. Public API."
-	 		    )
-	 		    @ApiResponse(
-	 		        responseCode = "200",
-	 		        description = "Categories fetched successfully"
-	 		    )
-	    @GetMapping
-	    public ResponseEntity<Page<CategoryDTO>> getAll( @RequestParam(defaultValue = "0") int page,
-	            @RequestParam(defaultValue = "10") int size) {
-	    	Pageable pageable = PageRequest.of(page, size);
-	        return ResponseEntity.ok(service.findAll(pageable));
-	    }
-
-	 	
-	 	 @Operation(
-	 	        summary = "Delete a category",
-	 	        description = "Deletes a category by ID. Category must not contain products. ADMIN only."
-	 	    )
-	 	    @ApiResponse(
-	 	        responseCode = "204",
-	 	        description = "Category deleted successfully"
-	 	    )
-	 	    @ApiResponse(
-	 	        responseCode = "400",
-	 	        description = "Category contains products and cannot be deleted"
-	 	    )
-	 	    @ApiResponse(
-	 	        responseCode = "404",
-	 	        description = "Category not found"
-	 	    )
-	 	    @ApiResponse(
-	 	        responseCode = "403",
-	 	        description = "Access denied (ADMIN only)"
-	 	    )
-	    @PreAuthorize("hasRole('ADMIN')")
-	    @DeleteMapping("/{id}")
-	    public ResponseEntity<Void> delete(@PathVariable Long id) {
-	        service.delete(id);
-	        return ResponseEntity.noContent().build();
-	    }
+	)
+	@ApiResponse(responseCode = "400", description = "Category already exists or validation failed")
+	@ApiResponse(responseCode = "403", description = "Access denied (ADMIN only)")
+	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO dto) {
+		return ResponseEntity.ok(service.create(dto));
 	}
 
+	@Operation(summary = "Get all categories", description = "Fetches all categories with pagination. Public API.")
+	@ApiResponse(responseCode = "200", description = "Categories fetched successfully")
+	@GetMapping
+	public ResponseEntity<Page<CategoryDTO>> getAll(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return ResponseEntity.ok(service.findAll(pageable));
+	}
+
+	@Operation(summary = "Delete a category", description = "Deletes a category by ID. Category must not contain products. ADMIN only.")
+	@ApiResponse(responseCode = "204", description = "Category deleted successfully")
+	@ApiResponse(responseCode = "400", description = "Category contains products and cannot be deleted")
+	@ApiResponse(responseCode = "404", description = "Category not found")
+	@ApiResponse(responseCode = "403", description = "Access denied (ADMIN only)")
+	@PreAuthorize("hasRole('ADMIN')")
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		service.delete(id);
+		return ResponseEntity.noContent().build();
+	}
+}
