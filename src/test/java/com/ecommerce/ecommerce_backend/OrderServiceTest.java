@@ -18,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -98,7 +102,7 @@ public class OrderServiceTest {
 	@Test
 	void testForCheckOutOrderCreated() {
 
-		when(cartRepository.findByUserId(USER_ID)).thenReturn(Optional.of(cart));
+		when(cartRepository.findByUser_Id(USER_ID)).thenReturn(Optional.of(cart));
 
 		when(ordersRepository.save(any(Orders.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -120,7 +124,7 @@ public class OrderServiceTest {
 
 	@Test
 	void testForCheckOutOrderFailure() {
-		when(cartRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
+		when(cartRepository.findByUser_Id(USER_ID)).thenReturn(Optional.empty());
 
 		assertThrows(ResourceNotFoundException.class, () -> ordersService.checkout());
 
@@ -136,19 +140,20 @@ public class OrderServiceTest {
 		OrdersResponseDTO dto1 = new OrdersResponseDTO();
 		OrdersResponseDTO dto2 = new OrdersResponseDTO();
 		OrdersResponseDTO dto3 = new OrdersResponseDTO();
-		when(ordersRepository.findByUserId(USER_ID)).thenReturn(Optional.of(List.of(order1, order2, order3)));
+		Pageable pageable = PageRequest.of(0, 10);
+		
+		Page<Orders> ordersPage = new PageImpl<>(List.of(order1,order2,order3));
+		when(ordersRepository.findByUser_Id(USER_ID, pageable)).thenReturn(ordersPage);
 		when(ordersResponseMapper.toDTO(order1)).thenReturn(dto1);
 		when(ordersResponseMapper.toDTO(order2)).thenReturn(dto2);
 		when(ordersResponseMapper.toDTO(order3)).thenReturn(dto3);
+		
 
-		List<OrdersResponseDTO> response = ordersService.myOrders();
+		Page<OrdersResponseDTO> response = ordersService.myOrders(pageable);
 
 		assertNotNull(response);
-		assertEquals(dto1, response.get(0));
-		assertEquals(dto2, response.get(1));
-		assertEquals(dto3, response.get(2));
-
-		verify(ordersRepository).findByUserId(USER_ID);
+		
+		verify(ordersRepository).findByUser_Id(USER_ID,pageable);
 		verify(ordersResponseMapper).toDTO(order3);
 		verify(ordersResponseMapper).toDTO(order2);
 		verify(ordersResponseMapper).toDTO(order1);
@@ -157,8 +162,9 @@ public class OrderServiceTest {
 
 	@Test
 	void testForGetMyOrdersFailure() {
-		when(ordersRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
-		assertThrows(ResourceNotFoundException.class, () -> ordersService.myOrders());
+		Pageable pageable = PageRequest.of(0, 10);
+		when(ordersRepository.findByUser_Id(USER_ID,pageable)).thenReturn(Page.empty());
+		assertThrows(ResourceNotFoundException.class, () -> ordersService.myOrders(pageable));
 
 		verify(ordersResponseMapper, never()).toDTO(any(Orders.class));
 
@@ -168,7 +174,7 @@ public class OrderServiceTest {
 	void testForCancelOrderSuccess() {
 
 		order1.setOrdersStatus(OrdersStatus.CREATED);
-		when(ordersRepository.findByUserId(USER_ID)).thenReturn(Optional.of(List.of(order1)));
+		when(ordersRepository.findByIdAndUser_Id(order1.getId(),USER_ID)).thenReturn(Optional.of(order1));
 		when(ordersRepository.save(order1)).thenReturn(order1);
 		OrdersResponseDTO dto = new OrdersResponseDTO();
 		dto.setStatus(OrdersStatus.CANCELLED);
@@ -183,7 +189,8 @@ public class OrderServiceTest {
 
 	@Test
 	void testForCancelOrderFailEmptyOrders() {
-		when(ordersRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
+		
+		when(ordersRepository.findByIdAndUser_Id(1L,USER_ID)).thenReturn(Optional.empty());
 		assertThrows(ResourceNotFoundException.class, () -> ordersService.cancelOrder(1L));
 		verify(ordersRepository, never()).save(any());
 	}
@@ -191,9 +198,10 @@ public class OrderServiceTest {
 	@Test
 	void testForCancelOrderFailNoOrderFound() {
 
-		when(ordersRepository.findByUserId(USER_ID)).thenReturn(Optional.of(List.of(order1)));
+		
+		when(ordersRepository.findByIdAndUser_Id(1L,USER_ID)).thenReturn(Optional.empty());
 
-		assertThrows(ResourceNotFoundException.class, () -> ordersService.cancelOrder(2L));
+		assertThrows(ResourceNotFoundException.class, () -> ordersService.cancelOrder(1L));
 		verify(ordersRepository, never()).save(any());
 	}
 }

@@ -2,8 +2,9 @@ package com.ecommerce.ecommerce_backend.order;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import com.ecommerce.ecommerce_backend.cart.CartRepository;
 import com.ecommerce.ecommerce_backend.exceptions.ResourceNotFoundException;
 import com.ecommerce.ecommerce_backend.user.AuthUserPrincipal;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,10 +35,11 @@ public class OrdersService {
 		return principal.id();
 	}
 
+	@Transactional
 	public OrdersResponseDTO checkout() {
 		Long userId = getLoggedInUserId();
 
-		Cart cart = cartRepository.findByUserId(userId)
+		Cart cart = cartRepository.findByUser_Id(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Cart is empty"));
 
 		Orders order = new Orders();
@@ -67,22 +70,21 @@ public class OrdersService {
 		return ordersResponseMapper.toDTO(savedOrder);
 	}
 
-	public List<OrdersResponseDTO> myOrders() {
+	public Page<OrdersResponseDTO> myOrders(Pageable pageable) {
 		Long userId = getLoggedInUserId();
 
-		List<Orders> orderList = ordersRepository.findByUserId(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("No orders found"));
+		Page<Orders> ordersPage = ordersRepository.findByUser_Id(userId,pageable);
+		if(ordersPage.isEmpty())
+				throw new ResourceNotFoundException("No orders found");
 
-		return orderList.stream().map(order -> ordersResponseMapper.toDTO(order)).toList();
+
+		return ordersPage.map(ordersResponseMapper::toDTO);
 
 	}
 
 	public OrdersResponseDTO cancelOrder(Long orderId) {
 		Long userId = getLoggedInUserId();
-		List<Orders> orders = ordersRepository.findByUserId(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("No orders found"));
-
-		Orders order = orders.stream().filter(o -> o.getId().equals(orderId)).findFirst()
+		Orders order = ordersRepository.findByIdAndUser_Id(orderId,userId)
 				.orElseThrow(() -> new ResourceNotFoundException("No order found with id = " + orderId));
 
 		order.setOrdersStatus(OrdersStatus.CANCELLED);

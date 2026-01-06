@@ -38,7 +38,7 @@ public class CartService {
 	public CartResponseDTO getMyCart() {
 		Long userId = getLoggedInUserId();
 
-		Cart cart = cartRepository.findByUserId(userId)
+		Cart cart = cartRepository.findByUser_Id(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
 		return cartResponseMapper.toDTO(cart);
@@ -50,7 +50,7 @@ public class CartService {
 		Long userId = getLoggedInUserId();
 
 		// Get user's cart or create a new one for the user
-		Cart cart = cartRepository.findByUserId(userId).orElseGet(() -> {
+		Cart cart = cartRepository.findByUser_Id(userId).orElseGet(() -> {
 			Cart newCart = new Cart();
 			Users user = userRepository.getReferenceById(userId);
 			newCart.setUser(user);
@@ -107,7 +107,7 @@ public class CartService {
 		// ResourceNotFoundException("User not found"));
 
 		// Get cart
-		Cart cart = cartRepository.findByUserId(userId)
+		Cart cart = cartRepository.findByUser_Id(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
 		CartItem cartItem = cart.getItems().stream().filter(item -> item.getProduct().getId().equals(id)).findFirst()
