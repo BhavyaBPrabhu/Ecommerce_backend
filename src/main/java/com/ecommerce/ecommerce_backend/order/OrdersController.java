@@ -39,7 +39,7 @@ public class OrdersController {
 			@ApiResponse(responseCode = "404", description = "Cart is empty") })
 	@PostMapping
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<OrdersResponseDTO> checkout() {
+	public ResponseEntity<OrdersResponseDTO> checkout(){
 		return ResponseEntity.ok(ordersService.checkout());
 	}
 

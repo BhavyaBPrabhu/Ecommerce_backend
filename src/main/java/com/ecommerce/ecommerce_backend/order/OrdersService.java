@@ -41,7 +41,10 @@ public class OrdersService {
 
 		Cart cart = cartRepository.findByUser_Id(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Cart is empty"));
-
+		
+		if (cart.getItems() == null || cart.getItems().isEmpty()) {
+	        throw new ResourceNotFoundException("Cart is empty");
+	    }
 		Orders order = new Orders();
 		order.setUser(cart.getUser());
 		order.setOrdersStatus(OrdersStatus.CREATED);

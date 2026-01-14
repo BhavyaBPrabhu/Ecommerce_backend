@@ -2,10 +2,12 @@ package com.ecommerce.ecommerce_backend.cart;
 
 import java.util.Optional;
 
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.ecommerce_backend.exceptions.BadRequestException;
 import com.ecommerce.ecommerce_backend.exceptions.ResourceNotFoundException;
 import com.ecommerce.ecommerce_backend.product.Product;
 import com.ecommerce.ecommerce_backend.product.ProductRepository;
@@ -45,7 +47,7 @@ public class CartService {
 
 	}
 
-	public CartResponseDTO addToCart(CartItemDTO cartItemDTO) {
+	public CartResponseDTO addToCart(CartItemDTO cartItemDTO)  {
 
 		Long userId = getLoggedInUserId();
 
@@ -65,6 +67,10 @@ public class CartService {
 		// Check whether the same product exists in the cart
 		Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
+		//Check whether the cart does not contain the item and User entered negative quantity
+		if(existingItem.isEmpty() && cartItemDTO.getQuantity()<=0)
+			throw new BadRequestException("Quantity must be greater than zero");
+	 
 		// Increase quantity
 		if (existingItem.isPresent()) {
 			CartItem item = existingItem.get();

@@ -1,4 +1,4 @@
-package com.ecommerce.ecommerce_backend;
+package com.ecommerce.ecommerce_backend.orders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,7 +40,7 @@ import com.ecommerce.ecommerce_backend.product.Product;
 import com.ecommerce.ecommerce_backend.user.AuthUserPrincipal;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderServiceTest {
+public class OrderServiceUnitTest {
 
 	@Mock
 	private OrdersRepository ordersRepository;
