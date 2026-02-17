@@ -35,6 +35,11 @@ public class ProductController {
 
 	private final ProductService productService;
 
+	@GetMapping("/health")
+	public String health() {
+	    return "Running";
+	}
+	
 	@Operation(summary = "Get all products", description = "Fetches paginated list of products as per the search criteria")
 	@GetMapping("/search")
 	public ResponseEntity<Page<ProductDTO>> searchProducts(@RequestParam(required = false) String name,

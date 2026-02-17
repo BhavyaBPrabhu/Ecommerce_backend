@@ -40,7 +40,7 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests((requests) -> requests.requestMatchers("/cart", "/cart/**")
 						.hasAnyRole("USER", "ADMIN").requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
 						// public endpoints
-						.requestMatchers("/users/login", "/error", "/users/register", "/products", "/category",
+						.requestMatchers("/users/login", "/error", "/users/register", "/products", "/category","/products/health",
 								"/products/**", "/category/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
 						.permitAll().requestMatchers("/users/**").authenticated()
 
